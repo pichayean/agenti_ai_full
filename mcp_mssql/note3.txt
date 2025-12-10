@@ -1,0 +1,123 @@
+﻿-- @LoanId
+IF EXISTS (
+    SELECT 1
+    FROM sys.extended_properties ep
+    JOIN sys.parameters p
+      ON p.object_id = ep.major_id
+     AND p.parameter_id = ep.minor_id
+    WHERE ep.[name] = N'MS_Description'
+      AND ep.class   = 2                      -- 2 = PARAMETER
+      AND p.object_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+      AND p.[name] = N'@LoanId'
+)
+BEGIN
+    EXEC sys.sp_updateextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'รหัสสัญญาเงินกู้ (จำเป็น)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@LoanId';
+END
+ELSE
+BEGIN
+    EXEC sys.sp_addextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'รหัสสัญญาเงินกู้ (จำเป็น)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@LoanId';
+END
+GO
+
+-- @AnnualRate
+IF EXISTS (
+    SELECT 1
+    FROM sys.extended_properties ep
+    JOIN sys.parameters p
+      ON p.object_id = ep.major_id
+     AND p.parameter_id = ep.minor_id
+    WHERE ep.[name] = N'MS_Description'
+      AND ep.class   = 2
+      AND p.object_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+      AND p.[name] = N'@AnnualRate'
+)
+BEGIN
+    EXEC sys.sp_updateextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'อัตราดอกเบี้ยทั้งปีแบบทศนิยม (เช่น 0.18 = 18%/ปี). ถ้าไม่มี Payment_Schedule ต้องระบุ',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@AnnualRate';
+END
+ELSE
+BEGIN
+    EXEC sys.sp_addextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'อัตราดอกเบี้ยทั้งปีแบบทศนิยม (เช่น 0.18 = 18%/ปี). ถ้าไม่มี Payment_Schedule ต้องระบุ',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@AnnualRate';
+END
+GO
+
+-- @PaymentsPerYear
+IF EXISTS (
+    SELECT 1
+    FROM sys.extended_properties ep
+    JOIN sys.parameters p
+      ON p.object_id = ep.major_id
+     AND p.parameter_id = ep.minor_id
+    WHERE ep.[name] = N'MS_Description'
+      AND ep.class   = 2
+      AND p.object_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+      AND p.[name] = N'@PaymentsPerYear'
+)
+BEGIN
+    EXEC sys.sp_updateextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'จำนวนงวดต่อปี (ปกติ 12 = รายเดือน)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@PaymentsPerYear';
+END
+ELSE
+BEGIN
+    EXEC sys.sp_addextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'จำนวนงวดต่อปี (ปกติ 12 = รายเดือน)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@PaymentsPerYear';
+END
+GO
+
+-- @RoundTo
+IF EXISTS (
+    SELECT 1
+    FROM sys.extended_properties ep
+    JOIN sys.parameters p
+      ON p.object_id = ep.major_id
+     AND p.parameter_id = ep.minor_id
+    WHERE ep.[name] = N'MS_Description'
+      AND ep.class   = 2
+      AND p.object_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+      AND p.[name] = N'@RoundTo'
+)
+BEGIN
+    EXEC sys.sp_updateextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'จำนวนหลักทศนิยมสำหรับปัดค่าเงิน (เช่น 2)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@RoundTo';
+END
+ELSE
+BEGIN
+    EXEC sys.sp_addextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'จำนวนหลักทศนิยมสำหรับปัดค่าเงิน (เช่น 2)',
+        @level0type = N'SCHEMA',    @level0name = N'dbo',
+        @level1type = N'PROCEDURE', @level1name = N'sp_CalcLoanTotalInterest',
+        @level2type = N'PARAMETER', @level2name = N'@RoundTo';
+END
+GO

@@ -1,0 +1,4 @@
+- maxSteps: 8
+- maxParallel: 3
+- maxLLMSteps: 2
+- timeoutSec: 120

@@ -1,0 +1,14 @@
+{
+    "profiles": {
+        "MssqlMcpServer": {
+            "commandName": "Project",
+            "launchBrowser": true,
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                //"MssqlMcpServer__Database__ConnectionString": "Server=marcus-dev.database.windows.net,1433;Database=LoanCoreDB;User Id=marcus;Password=M@rcus#1234;Encrypt=true;TrustServerCertificate=true;"
+                "MssqlMcpServer__Database__ConnectionString": "Server=localhost,1433;Database=LoanDataDB;User Id=sa;Password=P@ssw0rd!23;Encrypt=true;TrustServerCertificate=true;"
+            },
+            "applicationUrl": "https://localhost:51968;http://localhost:51969"
+        }
+    }
+}

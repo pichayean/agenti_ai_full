@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <title>Eval Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Evaluation Dashboard</h1>
+            <span class="subtitle">ดึงข้อมูลจาก https://localhost:5082/Evaluation</span>
+        </header>
+
+        <!-- controls -->
+        <section class="control-bar">
+            <button id="load-btn" class="btn-primary">โหลดข้อมูลจาก API</button>
+
+
+            <div id="progress-container" class="progress-container" hidden>
+                <div class="progress-track">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <span id="progress-label" class="progress-label">กำลังโหลด...</span>
+            </div>
+        </section>
+
+        <!-- Summary Cards -->
+        <section id="summary" class="summary-grid">
+            <!-- JS จะมาใส่ content ให้ -->
+        </section>
+
+        <!-- Main Table -->
+        <button onclick="downloadJson()">ดาวน์โหลด JSON</button>
+        <section class="table-section">
+            <div class="table-header">
+                <h2>Test Case Metrics</h2>
+                <span id="last-updated" class="last-updated"></span>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="test-table">
+                    <thead>
+                        <tr>
+                            <th>TestCase</th>
+                            <th>RunId</th>
+                            <th>Passed</th>
+                            <th>WTR</th>
+                            <th>PlanValidity</th>
+                            <th>Accuracy</th>
+                            <th>OverallScore</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS generate rows -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div style="margin-top:100px"></div>
+        <hr />
+        <div id="jsonOutput" class="code-box">รอโหลดข้อมูล...</div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

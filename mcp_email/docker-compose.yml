@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  email-mcp:
+    build: .
+    container_name: email-mcp
+    restart: unless-stopped
+    ports:
+      - "5053:5053"
+    environment:
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_PORT: "587"
+      SMTP_SECURE: "StartTls"
+      SMTP_USERNAME: "yourgmail@gmail.com"
+      SMTP_PASSWORD: "your_app_password"
+      SMTP_FROM: "yourgmail@gmail.com"
+      SMTP_FROM_NAME: "Email MCP"
+      SMTP_MAX_BODY_BYTES: "2097152"
+      SMTP_ONLY_GMAIL: "true"

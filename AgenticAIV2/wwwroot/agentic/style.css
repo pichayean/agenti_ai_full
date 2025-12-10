@@ -1,0 +1,464 @@
+﻿/* base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f5fb;
+    color: #111827;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 16px 40px;
+}
+
+/* header */
+.app-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 24px;
+}
+
+    .app-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .app-header .subtitle {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+/* summary cards */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-title {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.card-value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.card-extra {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* table */
+.table-section {
+    margin-top: 8px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+    .table-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+.last-updated {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.table-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+#test-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+    #test-table thead {
+        background: #f9fafb;
+    }
+
+    #test-table th,
+    #test-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    #test-table th {
+        font-weight: 600;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    #test-table tbody tr:hover:not(.detail-row) {
+        background: #f9fafb;
+    }
+
+/* badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-pass {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-fail {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.badge-neutral {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* detail rows */
+.detail-row {
+    background: #f9fafb;
+}
+
+.detail-cell {
+    padding: 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-content {
+    padding: 12px 16px 14px;
+    font-size: 12px;
+    color: #4b5563;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 12px;
+}
+
+.detail-block {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+}
+
+    .detail-block h4 {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .detail-block pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 11px;
+    }
+
+/* detail toggle button */
+.btn-toggle {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    font-size: 11px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+    .btn-toggle:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    .btn-toggle:active {
+        transform: scale(0.97);
+    }
+
+    .btn-toggle span.icon {
+        font-size: 12px;
+    }
+
+/* small responsive */
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #test-table th:nth-child(2),
+    #test-table td:nth-child(2) {
+        display: none; /* ซ่อน runId บนจอเล็ก */
+    }
+}
+/* control bar */
+.control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* primary button */
+.btn-primary {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+    .btn-primary:hover:not(:disabled) {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:active:not(:disabled) {
+        transform: scale(0.97);
+        box-shadow: 0 5px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: default;
+    }
+
+/* progress bar */
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 220px;
+}
+
+.progress-track {
+    position: relative;
+    width: 160px;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 25%; /* default */
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+    animation: progress-indeterminate 1.1s infinite linear;
+}
+
+.progress-label {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* แอนิเมชันแบบ indeterminate */
+@keyframes progress-indeterminate {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    50% {
+        transform: translateX(20%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+
+.code-box {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+.journal-block {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+}
+
+    .journal-block h4 {
+        margin: 0 0 6px;
+        font-size: 13px;
+    }
+
+.journal-chain {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.journal-node {
+    min-width: 180px;
+    max-width: 220px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.journal-node-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.journal-node-title {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.journal-node-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+.journal-node-duration {
+    opacity: 0.8;
+}
+
+.badge-status-succeeded {
+    background: #e3f8e6;
+    color: #1f7a2f;
+}
+
+.badge-status-failed,
+.badge-status-error {
+    background: #fde2e2;
+    color: #c0392b;
+}
+
+.badge-status-unknown {
+    background: #eee;
+    color: #555;
+}
+
+.btn-step-toggle {
+    margin-top: 4px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    cursor: pointer;
+}
+
+    .btn-step-toggle:hover {
+        background: #eee;
+    }
+
+.journal-io {
+    margin-top: 6px;
+    display: flex;
+    gap: 6px;
+}
+
+.journal-io-box {
+    flex: 1;
+    min-width: 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    padding: 4px;
+    max-height: 120px; /* fixed size */
+    overflow: auto; /* เลื่อนดูได้ */
+}
+
+.journal-io-title {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.journal-io pre {
+    margin: 0;
+    font-size: 11px;
+    white-space: pre;
+}
+
+.journal-arrow {
+    align-self: center;
+    font-size: 18px;
+    opacity: 0.7;
+}

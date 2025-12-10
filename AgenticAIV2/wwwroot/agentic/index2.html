@@ -1,0 +1,440 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minimal Web Chat</title>
+    <style>
+        :root {
+            --bg: #0b0c0f;
+            --card: #12141a;
+            --muted: #9aa3af;
+            --text: #e5e7eb;
+            --accent: #4f46e5;
+            --accent-2: #22c55e;
+            --border: #1f2530;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            display: grid;
+            place-items: center;
+        }
+
+        .app {
+            width: min(960px, 100%);
+            height: min(85vh, 800px);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: linear-gradient(180deg, #12141a, #0f1116);
+        }
+
+        .brand {
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .sid {
+            font-variant-numeric: tabular-nums;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .chat {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+            padding: 12px;
+            overflow: auto;
+        }
+
+        .empty {
+            color: var(--muted);
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .msg {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 10px;
+        }
+
+            .msg + .msg {
+                margin-top: 4px;
+            }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            background: #111827;
+            color: #a5b4fc;
+            border: 1px solid var(--border);
+        }
+
+            .avatar.bot {
+                color: #86efac;
+            }
+
+        .bubble {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #0f1319;
+            border: 1px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+
+            .bubble.user {
+                background: rgba(79,70,229,.1);
+                border-color: rgba(79,70,229,.25);
+            }
+
+            .bubble.bot {
+                background: rgba(34,197,94,.08);
+                border-color: rgba(34,197,94,.25);
+            }
+
+        .footer {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+            padding: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 44px;
+            max-height: 160px;
+            resize: none;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font: inherit;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            button[disabled] {
+                opacity: .6;
+                cursor: not-allowed;
+            }
+
+        details {
+            margin-top: 8px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background: #0e1116;
+        }
+
+        summary {
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        pre {
+            margin: 8px 0 0;
+            padding: 8px;
+            background: #0b0e13;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        /* Minimal markdown styles */
+        .md h2 {
+            font-size: 18px;
+            margin: 8px 0 4px
+        }
+
+        .md h3 {
+            font-size: 16px;
+            margin: 6px 0 2px
+        }
+
+        .md p {
+            margin: 6px 0
+        }
+
+        .md ul {
+            margin: 6px 0 6px 18px
+        }
+
+        .md li {
+            margin: 2px 0
+        }
+        /* table for logs */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 6px;
+            text-align: left
+        }
+
+        th {
+            color: var(--muted)
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <div class="brand">Web Chat • Minimal</div>
+            <div class="sid" id="sid"></div>
+        </div>
+
+        <div id="chat" class="chat">
+            <div class="empty">เริ่มคุยได้เลย พิมพ์ข้อความแล้วกด Enter</div>
+        </div>
+
+        <form class="footer" id="form">
+            <textarea id="input" placeholder="พิมพ์ข้อความ… (Shift+Enter ขึ้นบรรทัดใหม่)"></textarea>
+            <button id="send" type="submit">ส่ง</button>
+        </form>
+    </div>
+
+    <script>
+        // --- session id (GUID/UUID)
+        const sessionId = (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+        document.getElementById('sid').textContent = `sessionId: ${sessionId}`;
+
+        // --- DOM helpers
+        const chat = document.getElementById('chat');
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+
+        const scrollToBottom = () => chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
+
+        const el = (html) => {
+            const t = document.createElement('template');
+            t.innerHTML = html.trim();
+            return t.content.firstElementChild;
+        };
+
+        function addUserMessage(text) {
+            const node = el(`
+            <div class="msg">
+              <div class="avatar">คุณ</div>
+              <div class="bubble user"></div>
+            </div>`);
+            node.querySelector('.bubble').textContent = text;
+            if (chat.querySelector('.empty')) chat.innerHTML = '';
+            chat.appendChild(node);
+            scrollToBottom();
+        }
+
+        function addBotMessage({ final, email, plan, journal, llmHistory, raw }) {
+            const node = el(`
+            <div class=\"msg\">
+              <div class=\"avatar bot\">บอท</div>
+              <div class=\"bubble bot\">
+                <div class=\"md\" id=\"md\"></div>
+                <details>
+                  <summary>ดู Email</summary>
+                  <div style=\"margin-top:6px\">
+                    <div class=\"muted\">Subject</div>
+                    <pre id=\"sub\"></pre>
+                    <div class=\"muted\">Body</div>
+                    <pre id=\"body\"></pre>
+                  </div>
+                </details>
+                <details>
+                  <summary>แผนการทำงาน (plan)</summary>
+                  <pre id=\"plan\"></pre>
+                </details>
+                <details>
+                  <summary>บันทึกการทำงาน (journal)</summary>
+                  <pre id=\"journal\"></pre>
+                </details>
+                <details>
+                  <summary>LLM History</summary>
+                  <div id=\"llmh\"></div>
+                </details>
+                <details>
+                  <summary>Raw JSON</summary>
+                  <pre id=\"raw\"></pre>
+                </details>
+              </div>
+            </div>`);
+
+            node.querySelector('#md').innerHTML = mdToHtml(final || '');
+            node.querySelector('#sub').textContent = email?.subject || '';
+            node.querySelector('#body').textContent = email?.body || '';
+            node.querySelector('#plan').textContent = JSON.stringify(plan, null, 2);
+            node.querySelector('#journal').textContent = JSON.stringify(journal, null, 2);
+            node.querySelector('#llmh').innerHTML = renderLLMHistory(llmHistory);
+            node.querySelector('#raw').textContent = JSON.stringify(raw ?? {}, null, 2);
+
+            if (chat.querySelector('.empty')) chat.innerHTML = '';
+            chat.appendChild(node);
+            scrollToBottom();
+        }
+
+        // --- ultra-light markdown renderer for headings/bold/lists/links/newlines
+        function mdToHtml(md) {
+            if (!md) return '';
+            let h = md
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // escape
+            // headings
+            h = h.replace(/^###\s?(.*)$/gm, '<h3>$1<\/h3>');
+            h = h.replace(/^##\s?(.*)$/gm, '<h2>$1<\/h2>');
+            // bold & italics
+            h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1<\/strong>');
+            h = h.replace(/\*(.*?)\*/g, '<em>$1<\/em>');
+            // lists
+            h = h.replace(/^\s*[-•]\s(.*)$/gm, '<li>$1<\/li>');
+            h = h.replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}<\/ul>`);
+            // line breaks + paragraphs (keep blank lines)
+            h = h.replace(/\n\n/g, '</p><p>');
+            h = `<p>${h}<\/p>`;
+            // links
+            h = h.replace(/\[(.*?)\]\((https?:[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1<\/a>');
+            return h;
+        }
+
+        // --- networking
+        async function sendMessage(message) {
+            const payload = {
+                message,
+                sessionId
+            };
+            const res = await fetch('http://localhost/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                throw new Error(`HTTP ${res.status} — ${text || res.statusText}`);
+            }
+            return res.json();
+        }
+
+        function renderLLMHistory(h) {
+            if (!h) return '<div class=\"muted\">(ไม่มีข้อมูล)</div>';
+            const total = `<div class=\"muted\">รวมโทเคน: ${h.totalTokens ?? '-'} | prompt: ${h.totalPromptTokens ?? '-'} | completion: ${h.totalCompletionTokens ?? '-'}</div>`;
+            const rows = (h.entries || []).map((e, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${e.taskName ?? ''}</td>
+              <td>${e.model ?? ''}</td>
+              <td style=\"text-align:right\">${e.promptTokens ?? '-'}</td>
+              <td style=\"text-align:right\">${e.completionTokens ?? '-'}</td>
+              <td style=\"text-align:right\">${e.totalTokens ?? ((e.promptTokens || 0) + (e.completionTokens || 0))}</td>
+              <td>${e.timestamp ?? ''}</td>
+            </tr>`).join('');
+            return `${total}
+            <div style=\"overflow:auto; margin-top:6px\">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Model</th>
+                    <th>Prompt</th>
+                    <th>Completion</th>
+                    <th>Total</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>${rows || '<tr><td colspan=\"7\" class=\"muted\">No entries</td></tr>'}</tbody>
+              </table>
+            </div>`;
+        }
+
+        // --- UX wiring
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            addUserMessage(text);
+            sendBtn.disabled = true;
+
+            try {
+                const data = await sendMessage(text);
+                addBotMessage({
+                    final: data.final,
+                    email: data.email,
+                    plan: data.plan,
+                    journal: data.journal,
+                    llmHistory: data.llmHistory,
+                    raw: data,
+                });
+            } catch (err) {
+                addBotMessage({
+                    final: `## เกิดข้อผิดพลาด\n\n**รายละเอียด:** ${err.message}`,
+                    email: null, plan: null, journal: null, raw: null
+                });
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        });
+
+        // Enter to send, Shift+Enter for newline
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        // --- demo seed (optional): pre-fill example question
+        input.value = 'เรามีผลิตภัณฑ์อะไรบ้างที่ให้บริการสินเชื่อ';
+    </script>
+</body>
+</html>

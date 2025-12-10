@@ -1,0 +1,53 @@
+﻿[
+    {
+        "id": "TC-001",
+        "request": {
+            "prompt": "ช่วยหาลูกค้าที่มีชื่อ 'สมชาย ใจดี' จากนั้น ดึงข้อมูลลูกค้าคนนั้นพร้อมรายการสินเชื่อทั้งหมด สำหรับแต่ละสัญญาเงินกู้ ให้สรุปว่า ยอดคงเหลือประมาณการตอนนี้เท่าไหร่ งวดถัดไปที่ต้องจ่ายคือวันที่เท่าไหร่ และมีสถานะยังไง (ค้าง/ไม่ค้าง)สรุปให้ในรูปแบบอ่านง่ายหน่อย และส่ง email แจ้งทีม sale ให้รับทราบด้วยหน่อย",
+            "lang": "th"
+        },
+        "policy": {
+            "tools": {
+                "allowed": [ "mssql_mcp.qry_customers", "mssql_mcp.qry_customer_with_loans", "mail_mcp.send_email" ],
+                "required": [ "mssql_mcp.qry_customers", "mssql_mcp.qry_customer_with_loans", "mail_mcp.send_email" ],
+                "forbidden": [],
+                "strict": true
+            }
+        },
+        "metrics": {
+            "wtr": {
+                "enabled": true
+            },
+            "planValidity": {
+                "level": "L2",
+                "requireAllSucceeded": true
+            },
+            "accuracy": {
+                "containment": {
+                    "source": "final",
+                    "mustContain": [
+                        "45,000.00",
+                        "LO20250110-0001",
+                        "ACTIVE",
+                        "DIM"
+                    ],
+                    "mustNotContain": []
+                },
+                "caseInsensitive": true,
+                "normalizeWhitespace": true,
+                "threshold": 0.75
+            }
+        },
+        "channels": {
+            "email": {
+                "allowed": true,
+                "required": false,
+                "to": [ "sales_team@gmail.com" ]
+            }
+        },
+        "meta": {
+            "version": "1.1",
+            "created": "2025-11-10",
+            "description": "สรุป สมชาย ใจดี + ส่งอีเมลให้ทีม sale"
+        }
+    }
+]

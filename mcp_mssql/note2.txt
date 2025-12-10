@@ -1,0 +1,25 @@
+﻿-- เพิ่ม (หรือแก้ไข) คำอธิบายของ Stored Procedure
+IF EXISTS (
+    SELECT 1
+    FROM sys.extended_properties ep
+    WHERE ep.[name] = N'MS_Description'
+      AND ep.class = 1                      -- 1 = OBJECT_OR_COLUMN (object-level)
+      AND ep.major_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+      AND ep.minor_id = 0
+)
+BEGIN
+    EXEC sys.sp_updateextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'คำนวณยอดดอกเบี้ยรวม/ค่างวดทั้งหมดของสัญญาเงินกู้ (Reducing/Flat). ถ้ามี Payment_Schedule จะสรุปจากตารางจริง; ถ้าไม่มี จะจำลองตารางตามอัตราดอกเบี้ยที่ส่งเข้ามา.',
+        @level0type = N'SCHEMA',   @level0name = N'dbo',
+        @level1type = N'PROCEDURE',@level1name = N'sp_CalcLoanTotalInterest';
+END
+ELSE
+BEGIN
+    EXEC sys.sp_addextendedproperty 
+        @name  = N'MS_Description',
+        @value = N'คำนวณยอดดอกเบี้ยรวม/ค่างวดทั้งหมดของสัญญาเงินกู้ (Reducing/Flat). ถ้ามี Payment_Schedule จะสรุปจากตารางจริง; ถ้าไม่มี จะจำลองตารางตามอัตราดอกเบี้ยที่ส่งเข้ามา.',
+        @level0type = N'SCHEMA',   @level0name = N'dbo',
+        @level1type = N'PROCEDURE',@level1name = N'sp_CalcLoanTotalInterest';
+END
+GO

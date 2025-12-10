@@ -1,0 +1,25 @@
+﻿-- ดู description ของตัวโปรซีเยอร์
+SELECT 
+    o.[name] AS ObjectName,
+    ep.[value] AS Description
+FROM sys.objects o
+LEFT JOIN sys.extended_properties ep
+    ON ep.major_id = o.object_id
+   AND ep.minor_id = 0
+   AND ep.[name] = N'MS_Description'
+   AND ep.class = 1
+WHERE o.[type] = 'P'
+  AND o.[name] = N'sp_CalcLoanTotalInterest';
+
+-- ดู description ของพารามิเตอร์ทั้งหมด
+SELECT 
+    p.[name]     AS ParameterName,
+    ep.[value]   AS Description
+FROM sys.parameters p
+LEFT JOIN sys.extended_properties ep
+    ON ep.major_id = p.object_id
+   AND ep.minor_id = p.parameter_id
+   AND ep.[name]  = N'MS_Description'
+   AND ep.class   = 2
+WHERE p.object_id = OBJECT_ID(N'dbo.sp_CalcLoanTotalInterest')
+ORDER BY p.parameter_id;

@@ -1,0 +1,13 @@
+{
+  "provider": "openrouter",
+  "baseUrl": "https://openrouter.ai/api/v1",
+  "chatModel": "gpt-4o-mini",
+  "tokenBudget": {
+    "planner": 4000,
+    "composer": 5000
+  },
+  "temperature": {
+    "planner": 0.2,
+    "composer": 0.4
+  }
+}

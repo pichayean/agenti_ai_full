@@ -1,0 +1,100 @@
+﻿SELECT 
+    s.name AS SchemaName,
+    p.name AS ProcedureName,
+    ep.value AS ProcedureDescription,
+    m.definition AS ProcedureDefinition,
+    (
+        SELECT 
+            pa.parameter_id   AS ParameterId,
+            pa.name           AS Name,
+            TYPE_NAME(pa.user_type_id) AS SqlType,
+            CASE 
+                WHEN TYPE_NAME(pa.user_type_id) IN (N'nchar', N'nvarchar', N'char', N'varchar', N'binary', N'varbinary')
+                    THEN CASE 
+                            WHEN pa.max_length = -1 THEN N'MAX'
+                            WHEN TYPE_NAME(pa.user_type_id) LIKE N'n%' THEN CAST(pa.max_length/2 AS nvarchar(10))
+                            ELSE CAST(pa.max_length AS nvarchar(10)) 
+                         END
+                ELSE NULL
+            END               AS LengthOrMax,
+            CASE WHEN TYPE_NAME(pa.user_type_id) IN (N'decimal', N'numeric') THEN pa.[precision] END AS [Precision],
+            CASE WHEN TYPE_NAME(pa.user_type_id) IN (N'decimal', N'numeric') THEN pa.scale END AS [Scale],
+            pa.is_output      AS IsOutput,
+            CASE WHEN pa.is_output = 1 THEN N'OUTPUT' ELSE N'INPUT' END AS [Direction],
+            pa.is_nullable    AS IsNullable,
+            -- DefaultValue: พาร์สจากส่วน header ของโปรซีเยอร์
+            LTRIM(RTRIM(dv.DefaultValue)) AS DefaultValue,
+            CAST(ep2.value AS nvarchar(max)) AS Description
+        FROM sys.parameters pa
+        LEFT JOIN sys.extended_properties ep2
+          ON ep2.class = 2
+         AND ep2.major_id = pa.object_id
+         AND ep2.minor_id = pa.parameter_id
+         AND ep2.name = N'MS_Description'
+        CROSS APPLY (
+            -- กำหนดขอบเขต header = ช่วงตั้งแต่คำว่า 'PROCEDURE' ถึงหน้าคำว่า 'AS'
+            SELECT 
+                def     = m.definition,
+                procPos = NULLIF(CHARINDEX('PROCEDURE', m.definition), 0),
+                asPos   = NULLIF(CHARINDEX('AS',        m.definition), 0)
+        ) hdr
+        CROSS APPLY (
+            SELECT header = 
+                CASE 
+                    WHEN hdr.procPos IS NOT NULL AND hdr.asPos IS NOT NULL AND hdr.asPos > hdr.procPos
+                        THEN SUBSTRING(hdr.def, hdr.procPos, hdr.asPos - hdr.procPos)
+                    ELSE hdr.def -- ถ้าหาไม่เจอ ใช้ทั้ง definition เผื่อกรณีพิเศษ
+                END
+        ) h
+        CROSS APPLY (
+            -- หา '=' หลังชื่อพารามิเตอร์ภายใน header
+            SELECT 
+                namePos = NULLIF(CHARINDEX(pa.name, h.header), 0),
+                eqPos   = CASE 
+                            WHEN CHARINDEX(pa.name, h.header) > 0 
+                                THEN NULLIF(CHARINDEX('=', h.header, CHARINDEX(pa.name, h.header)), 0)
+                            ELSE NULL
+                          END
+        ) pos
+        CROSS APPLY (
+            -- หาตำแหน่งสิ้นสุด default: คอมมาหรือวงเล็บปิดที่อยู่ถัดไป ตัดตอนที่ใกล้ที่สุด
+            SELECT 
+                commaPos = CASE WHEN pos.eqPos IS NULL THEN 0 ELSE CHARINDEX(',', h.header, pos.eqPos + 1) END,
+                parenPos = CASE WHEN pos.eqPos IS NULL THEN 0 ELSE CHARINDEX(')', h.header, pos.eqPos + 1) END
+        ) endpos
+        CROSS APPLY (
+            SELECT 
+                endAt = CASE 
+                            WHEN pos.eqPos IS NULL THEN 0
+                            ELSE 
+                                CASE 
+                                    WHEN (CASE WHEN endpos.commaPos = 0 THEN 2147483647 ELSE endpos.commaPos END) 
+                                         <  (CASE WHEN endpos.parenPos = 0 THEN 2147483647 ELSE endpos.parenPos END)
+                                        THEN (CASE WHEN endpos.commaPos = 0 THEN LEN(h.header) + 1 ELSE endpos.commaPos END)
+                                    ELSE (CASE WHEN endpos.parenPos = 0 THEN LEN(h.header) + 1 ELSE endpos.parenPos END)
+                                END
+                        END
+        ) cut
+        CROSS APPLY (
+            SELECT 
+                DefaultValue = CASE 
+                                  WHEN pos.eqPos IS NULL OR cut.endAt = 0 OR cut.endAt <= pos.eqPos 
+                                      THEN NULL
+                                  ELSE SUBSTRING(h.header, pos.eqPos + 1, cut.endAt - (pos.eqPos + 1))
+                               END
+        ) dv
+        WHERE pa.object_id = p.object_id
+        ORDER BY pa.parameter_id
+        FOR JSON PATH
+    ) AS ParamsJson
+FROM sys.procedures p
+JOIN sys.schemas s
+  ON p.schema_id = s.schema_id
+LEFT JOIN sys.extended_properties ep
+  ON ep.major_id = p.object_id
+ AND ep.minor_id = 0
+ AND ep.class = 1
+ AND ep.name = N'MS_Description'
+LEFT JOIN sys.sql_modules m
+  ON p.object_id = m.object_id
+ORDER BY s.name, p.name;

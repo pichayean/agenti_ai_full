@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  # ============================================================================
+  # Email MCP Server - MCP server for email functionality
+  # ============================================================================
+  email-mcp-v1:
+    build:
+      context: ./mcp_email
+      dockerfile: Dockerfile
+    container_name: email-mcp-v1
+    restart: unless-stopped
+    ports:
+      - "5055:80"
+    networks:
+      - agentic-network
+  # ============================================================================
+  # MSSQL MCP Server - MCP server for SQL Server database operations
+  # ============================================================================
+  mcp-mssql-v1:
+    build:
+      context: ./mcp_mssql
+      dockerfile: Dockerfile
+    container_name: mcp-mssql-v1
+    restart: unless-stopped
+    ports:
+      - "5056:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+    networks:
+      - agentic-network
+
+  # ============================================================================
+  # Agentic AI - Main application server
+  # ============================================================================
+  agenticai-v2:
+    build:
+      context: ./AgenticAIV2
+      dockerfile: Dockerfile
+    container_name: agenticai-v2
+    restart: unless-stopped
+    ports:
+      - "5082:80"
+    environment:
+      ASPNETCORE_URLS: "http://+:80"
+      ASPNETCORE_ENVIRONMENT: "Production"
+      # LLM Configuration
+      USE_OLLAMA: "false"
+      OpenRouter__ApiKey: sk-or-v1-xxxxx
+      McpServers__0__Endpoint: "http://email-mcp-v1:80/mcp"
+      McpServers__0__Name: "mail_mcp"
+      McpServers__0__Enable: true
+      McpServers__1__Endpoint: "http://mcp-mssql-v1:80/mcp"
+      McpServers__1__Name: "mssql_mcp"
+      McpServers__1__Enable: true
+    volumes:
+      - ./AgenticAI/prompts:/app/prompts:ro
+      - ./AgenticAI/config:/app/config:ro
+      - ./AgenticAI/policy:/app/policy:ro
+    networks:
+      - agentic-network
+
+  # ============================================================================
+  # Optional: Local MSSQL Server
+  # Uncomment this section if you want to run a local SQL Server instance
+  # ============================================================================
+  sqlserver:
+    build:
+      context: ./database
+      dockerfile: Dockerfile.mssql
+    container_name: loan-sql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - SA_PASSWORD=P@ssw0rd!23
+    ports:
+      - "1433:1433"
+
+networks:
+  agentic-network:
+    driver: bridge
+
+volumes:
+  mssql_data:
+    driver: local
